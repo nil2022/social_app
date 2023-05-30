@@ -1,6 +1,6 @@
 'use strict';
-require('dotenv').config()
 const jwt = require("jsonwebtoken");
+const { SECRET } = require('../configs/server.config.js')
 
 let verifyToken = (req, res, next) => {
 
@@ -10,10 +10,11 @@ let verifyToken = (req, res, next) => {
         return res.status(403).send("No Token Provided");
     }
 
-    jwt.verify(token, process.env.SECRET, (err, decoded) => {
+    jwt.verify(token, SECRET, (err, decoded) => {
 
         if (err) {
-            return res.status(401).send("Unauthorized code");
+            console.log("Error at jwt.verify: ", err.message);
+            return res.status(401).send("Unauthorized Access!");
         }
 
         req.userId = decoded.id;
@@ -23,5 +24,5 @@ let verifyToken = (req, res, next) => {
 }
 
 module.exports = {
-    verifyToken,
+    verifyToken
 }

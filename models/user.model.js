@@ -22,6 +22,15 @@ const userSchema = new mongoose.Schema({
         unique:true,
         minLenth:10
     },
+    createdAt: {
+        type: Date,
+        immutable:true,
+        default: Date.now()
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now()
+    }
 })
 
 module.exports = mongoose.model("User", userSchema);

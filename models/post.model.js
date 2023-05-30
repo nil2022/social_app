@@ -17,19 +17,13 @@ const postSchema = new mongoose.Schema({
         ref: 'User'
     },
     createdAt: {
-        type: String,
+        type: Date,
         immutable:true,
-        default: () => {
-            const date = new Date();
-            return date.toString();
-        }
+        default: Date.now()
     },
     updatedAt: {
-        type: String,
-        default: () => {
-            const date = new Date();
-            return date.toString();
-        }
+        type: Date,
+        default: Date.now()
     }
 })
 

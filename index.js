@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose')
 const path = require('path')
 const app = express()
+const { PORT } = require('./configs/server.config.js')
 app.use(bodyParser.json());
 app.use(express.json())
 
@@ -23,6 +24,6 @@ require("./routes/auth.routes")(app);
 require("./routes/post.routes")(app);
 
 
-app.listen(process.env.PORT, ()=> {
-  console.log(`Application started on port http://127.0.0.1:${process.env.PORT}`)
+app.listen(PORT, ()=> {
+  console.log(`Application started on port http://127.0.0.1:${PORT}`)
 })

@@ -3,6 +3,7 @@ require('dotenv').config()
 const bcrypt = require("bcrypt");
 const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
+const { SECRET } = require('../configs/server.config.js')
 
 exports.signup = async (req,res)=>{
 
@@ -48,7 +49,7 @@ exports.signin = async (req,res)=>{
             return res.status(401).send("Invalid Password");
         }
 
-            const token = jwt.sign({id:user.userId},process.env.SECRET,{
+            const token = jwt.sign({id:user.userId},SECRET,{
                 expiresIn:'12h' //12hours
             });
     
