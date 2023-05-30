@@ -1,0 +1,24 @@
+{
+  "name": "instagram-clone",
+  "version": "1.0.0",
+  "description": "Instagram clone using express, jsonwebtoken, addpost, deletepost",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm install bcrypt bcryptjs body-parser cors dotenv express jsonwebtoken mongoose node-rest-client path --save",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.2.1",
+    "node-rest-client": "^3.1.1",
+    "path": "^0.12.7"
+  }
+}
