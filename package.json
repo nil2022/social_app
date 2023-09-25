@@ -5,20 +5,22 @@
   "main": "index.js",
   "scripts": {
     "build": "npm install bcrypt bcryptjs body-parser cors dotenv express jsonwebtoken mongoose node-rest-client path nodemon --save",
-    "start": "nodemon ./index.js"
+    "start": "node ./index.js",
+    "dev": "nodemon ./index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^5.1.0",
+    "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.0.3",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.0",
-    "mongoose": "^7.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.5.2",
     "node-rest-client": "^3.1.1",
+    "nodemon": "^3.0.1",
     "path": "^0.12.7"
   }
 }

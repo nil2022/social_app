@@ -10,11 +10,17 @@ app.use(bodyParser.json());
 app.use(express.json())
 
 mongoose.connect(process.env.DB_URL);
-const db = mongoose.connection
-db.on("error", () => console.log("Can't connect to DB"))
-db.once("open", () => {
-    console.log("\nConnected to Mongo DB\n")   
-})
+
+try {
+  const db = mongoose.connection;
+  db.on("error", () => console.log("Can't connect to DB"))
+  db.once("open", () => {
+      console.log("\nConnected to Mongo DB\n")   
+  })
+} catch (error) {
+    console.log('Error'+error);
+}
+
 
 app.get('/', (req, res) => {
   res.status(200).sendFile(path.join(__dirname, 'index.html'))
