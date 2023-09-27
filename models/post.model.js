@@ -1,16 +1,18 @@
 'use strict';
-const mongoose = require("mongoose");
-const User = require('./user.model')
 
+//import mongoose
+const mongoose = require("mongoose");
+
+//route handler
 const postSchema = new mongoose.Schema({
     title: {
         type: String,
-        required: true,
+        required: [true,'Please provide title of post'],
         unique:true
     },
     content: {
         type: String,
-        required: true
+        required: [true,'Please provide content']
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -27,4 +29,5 @@ const postSchema = new mongoose.Schema({
     }
 })
 
+//export
 module.exports = mongoose.model("Post", postSchema);

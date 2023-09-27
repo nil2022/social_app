@@ -1,26 +1,28 @@
 'use strict';
+
+//import mongoose
 const mongoose = require("mongoose");
 
+//route handler
 const userSchema = new mongoose.Schema({
     name:{
         type:String,
-        required:true
+        required:[true,'Please provide name']
     },
     userId:{
         type:String,
-        required:true,
+        required:[true,'Please provide userId'],
         unique:true
     },
     password:{
         type:String,
-        required:true
+        required:[true,'Please provide password']
     },
     email:{
         type:String,
-        required:true,
+        required:[true,'Please provide email'],
         lowercase:true,
-        unique:true,
-        minLenth:10
+        unique:true
     },
     createdAt: {
         type: Date,
@@ -33,4 +35,5 @@ const userSchema = new mongoose.Schema({
     }
 })
 
+//export
 module.exports = mongoose.model("User", userSchema);

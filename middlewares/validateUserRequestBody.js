@@ -1,5 +1,6 @@
 'use strict';
 const User = require("../models/user.model");
+const { formatDate } =  require("../utils/formatDate")  //to convert & view UTC date to Indian Time format (doesn't modify in MongoDB database)
 
 let validateUserRequestBody = async (req,res,next)=>{
 
@@ -19,8 +20,19 @@ let validateUserRequestBody = async (req,res,next)=>{
 
     //check whether UserId already exists in DB
     if(user!=null){
-        console.log("userId already exists", user);
-        return res.status(400).send("Failed! userId already exists");
+        const IndiaDateCreatedAt = formatDate(user.createdAt)
+        const IndiaDateUpdatedAt = formatDate(user.updatedAt)
+        const userData = {
+            name: user.name,
+            userId: user.userId,
+            email: user.email,
+            createdAt: IndiaDateCreatedAt,
+            updatedAt: IndiaDateUpdatedAt
+        }
+        console.log("userId already exists!", userData);
+        return res.status(400).send({
+            Message: "Failed!, userId already exists!"
+        });
     }
 
        //validating email 

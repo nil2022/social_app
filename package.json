@@ -1,24 +1,48 @@
 {
-  "name": "instagram-clone",
-  "version": "1.0.0",
-  "description": "Instagram clone using express, jsonwebtoken, addpost, deletepost",
+  "name": "social-app",
+  "version": "1.0.2",
+  "description": "A Social app developed using Express, jsonwebtoken, mongoose",
   "main": "index.js",
   "scripts": {
-    "build": "npm install bcrypt bcryptjs body-parser cors dotenv express jsonwebtoken mongoose node-rest-client path nodemon --save",
-    "start": "nodemon ./index.js"
+    "build": "npm install bcrypt body-parser dotenv express jsonwebtoken mongoose node-rest-client path nodemon moment-timezone --save",
+    "start": "node index.js",
+    "dev":   "nodemon index.js"
   },
-  "author": "",
+  "author": "Nilanjan",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^5.1.0",
-    "bcryptjs": "^2.4.3",
+    "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
-    "cors": "^2.8.5",
-    "dotenv": "^16.0.3",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.0",
-    "mongoose": "^7.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "moment-timezone": "^0.5.43",
+    "mongoose": "^7.5.3",
     "node-rest-client": "^3.1.1",
+    "nodemon": "^3.0.1",
     "path": "^0.12.7"
-  }
+  },
+  "keywords": [
+    "mongodb",
+    "express",
+    "jsonwebtoken",
+    "bcrypt",
+    "mongoose",
+    "dotenv",
+    "body-parser",
+    "body-parser",
+    "node-rest-client",
+    "path",
+    "nodemon",
+    "moment-timezone"
+  ],
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nil2022/instagram_clone.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nil2022/instagram_clone/issues"
+  },
+  "homepage": "https://github.com/nil2022/instagram_clone#readme"
 }

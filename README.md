@@ -1,17 +1,21 @@
-# Instagram Clone 
-**v1.0.1**
+# Social App <img src="./assets/instagram_2111463.png" width=30px height=30px>
+**v1.0.2**
 
 This app is build using Backend Development tools like 
-> **bcryptjs, body-parser, dotenv, express, jsonwebtoken, mongoose, node-rest-client, path**
+> **bcrypt, body-parser, dotenv, express, jsonwebtoken, mongoose, node-rest-client, path, moment-timezone**
 
-### _API's available:-_
+### API's available:-
 
-1. Signup http://127.0.0.1:3100/api/v1/auth/signup
-2. Signin http://127.0.0.1:3100/api/v1/auth/signin
-3. Add one Post/many Posts (one at a time) http://127.0.0.1:3100/api/v1/addPost
-4. Fetch all Posts specifying user http://127.0.0.1:3100/api/v1/posts
-5. Delete one Post specifying Post Id http://127.0.0.1:3100/api/v1/posts
-6. Delete All Post specifying user http://127.0.0.1:3100/api/v1/allposts
+NOTE:- 
+**1️⃣** Use {your_URL} or {localhost}
+**2️⃣** Request Format - (Method) (Type) (URL)
+
+1. **[POST]** - Signup - http://{URL}/api/v1/auth/signup
+2. **[POST]** - Signin - http://{URL}/api/v1/auth/signin
+3. **[POST]** - Add one Post/many Posts (one Post at a time) - http://{URL}/api/v1/addPost
+4. **[GET]**  - Fetch all Posts specifying user - http://{URL}/api/v1/posts
+5. **[DELETE]** - Delete one Post specifying Post Id - http://{URL}/api/v1/posts
+6. **[DELETE]** - Delete All Post specifying userId - http://{URL}/api/v1/allposts
 
 ### Installation:-
 
@@ -24,13 +28,25 @@ This app is build using Backend Development tools like
 
 - Start the server by running this command
     ### ```npm run start```
-- Click here to view Welcome page - http://127.0.0.1:3100
+-To check if all is working good! 🎉 - http://{URL}:{PORT}
+N.B. - PORT can be defined in **".env"** file, otherwise it will default to **3001**
+
+<img align=center src="./assets/home_page.jpg"  width="80%" height="80%"><br>
+<!-- [![](./assets/Home_page.png)](https://locize.com/blog/next-i18next/) -->
 
 ### Note to Developers:-
-- I have added my MongoDB database URL to Environment Variable **(.env)** file and all other secrets, so I insist to create a **(.env)** file and add necessary configuration data which is neede to be hidden form end-user/other developers.
+- I have added my MongoDB database URL to my Environment Variable **(.env)** file and all other secrets, so I insist to create a **(.env)** file and add necessary configuration data which is needed to be hidden from end-user/other developers.
 
- - All the API's mentioned above will work best in Postman (Preferred, becoz I use it!) for testing ad development, but other apps may also be used.
+- All the API's mentioned above will work best in Postman (Preferred, becoz I use it!) for testing and development, but other apps may also be used.
 
 ### Update
 ***30-05-2023***
 - Testing Backend API's and other features to optimise it. Need a Front-end part to be build.
+
+***01-06-2023***
+- Added some functionalities. 
+
+***27-09-2023***
+- Added some functionalities. 
+- Updated README 
+    

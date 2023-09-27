@@ -3,3 +3,8 @@ node_modules/
 
 #Environment variable
 .env
+
+.gitignore
+
+#README HTML file created by Markdown previewer
+README.html
