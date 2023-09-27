@@ -4,20 +4,36 @@
   "description": "A Social app developed using Express, jsonwebtoken, mongoose",
   "main": "index.js",
   "scripts": {
+<<<<<<< HEAD
     "build": "npm install bcrypt body-parser dotenv express jsonwebtoken mongoose node-rest-client path nodemon moment-timezone --save",
     "start": "node index.js",
     "dev":   "nodemon index.js"
+=======
+    "build": "npm install bcrypt bcryptjs body-parser cors dotenv express jsonwebtoken mongoose node-rest-client path nodemon --save",
+    "start": "node ./index.js",
+    "dev": "nodemon ./index.js"
+>>>>>>> a4e15758866100650bd8596add25da42645ca155
   },
   "author": "Nilanjan",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
+<<<<<<< HEAD
     "body-parser": "^1.20.2",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
     "moment-timezone": "^0.5.43",
     "mongoose": "^7.5.3",
+=======
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.5.2",
+>>>>>>> a4e15758866100650bd8596add25da42645ca155
     "node-rest-client": "^3.1.1",
     "nodemon": "^3.0.1",
     "path": "^0.12.7"

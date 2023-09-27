@@ -28,10 +28,10 @@ NOTE:-
 
 - Start the server by running this command
     ### ```npm run start```
--To check if all is working good! 🎉 - http://{URL}:{PORT}
-N.B. - PORT can be defined in **".env"** file, otherwise it will default to **3001**
+- To check if all is working good! 🎉 - http://{URL}:{PORT}
+- **N.B.** - **PORT** can be defined in **".env"** file, otherwise it will default to **3001**
 
-<img align=center src="./assets/home_page.jpg"  width="80%" height="80%"><br>
+<img align=center src="./assets/home_page.jpg"  width="90%" height="100%"><br>
 <!-- [![](./assets/Home_page.png)](https://locize.com/blog/next-i18next/) -->
 
 ### Note to Developers:-

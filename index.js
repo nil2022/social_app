@@ -11,24 +11,18 @@ const db_url = process.env.DB_URL || 'mongodb://127.0.0.1:27017/instagram'
 app.use(express.urlencoded({extended:true}));
 app.use(express.json());
 
-// connect to MongoDB
-mongoose.connect(db_url,{
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
+mongoose.connect(process.env.DB_URL);
 
-// Get the default connection
-const db = mongoose.connection
+try {
+  const db = mongoose.connection;
+  db.on("error", () => console.log("Can't connect to DB"))
+  db.once("open", () => {
+      console.log("\nConnected to Mongo DB\n")   
+  })
+} catch (error) {
+    console.log('Error'+error);
+}
 
-// Event handlers for successful connection and connection error
-db.on("error", (err) => console.log("Can't connect to DB", err))
-// db.once("open", () => {
-//     console.log("\nConnected to Mongo DB\n")   
-// })
-
-db.on('open', ()=> {
-  console.log("\nConnected to MongoDB\n")
-})
 
 // Graceful shutdown on process termination
 process.on('SIGINT', async () => {
