@@ -29,18 +29,6 @@ db.on("error", (err) => console.log("Can't connect to DB", err))
 db.on('open', ()=> {
   console.log("\nConnected to MongoDB\n")
 })
-mongoose.connect(process.env.DB_URL);
-
-try {
-  const db = mongoose.connection;
-  db.on("error", () => console.log("Can't connect to DB"))
-  db.once("open", () => {
-      console.log("\nConnected to Mongo DB\n")   
-  })
-} catch (error) {
-    console.log('Error'+error);
-}
-
 
 // Graceful shutdown on process termination
 process.on('SIGINT', async () => {
