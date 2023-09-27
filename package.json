@@ -4,7 +4,7 @@
   "description": "A Social app developed using Express, jsonwebtoken, mongoose",
   "main": "index.js",
   "scripts": {
-    "build": "npm install bcrypt body-parser dotenv express jsonwebtoken mongoose node-rest-client path nodemon moment-timezone--save",
+    "build": "npm install bcrypt body-parser dotenv express jsonwebtoken mongoose node-rest-client nodemon moment-timezone --save",
     "start": "node ./index.js",
     "dev": "nodemon ./index.js"
   },
@@ -19,8 +19,7 @@
     "moment-timezone": "^0.5.43",
     "mongoose": "^7.5.3",
     "node-rest-client": "^3.1.1",
-    "nodemon": "^3.0.1",
-    "path": "^0.12.7"
+    "nodemon": "^3.0.1"
   },
   "keywords": [
     "mongodb",

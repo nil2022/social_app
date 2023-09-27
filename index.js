@@ -3,7 +3,6 @@ require('dotenv').config() //needed to fetch data from .env file
 const express = require('express')
 // const bodyParser = require('body-parser');  //not needed as express.json is used
 const mongoose = require('mongoose')
-const path = require('path')
 const app = express()
 const { PORT } = require('./configs/server.config.js')
 const db_url = process.env.DB_URL || 'mongodb://127.0.0.1:27017/instagram'
