@@ -41,8 +41,9 @@ exports.addPost = async (req, res) => {
         await post.save();
         console.log("Post created successfully", post);
         res.status(201).json({ message: 'Post created successfully', post });
+
     } catch (error) {
-        console.log("Error occured at post.controller, createPost: ", error.message);
+        console.log("Error at post.controller:", error.message);
         res.status(500).send('Internal Server Error');
     }
 };

@@ -1,64 +1,72 @@
-'use strict';
+"use strict";
 const User = require("../models/user.model");
-const { formatDate } =  require("../utils/formatDate")  //to convert & view UTC date to Indian Time format (doesn't modify in MongoDB database)
 
-let validateUserRequestBody = async (req,res,next)=>{
+/*********** Convert & View UTC Time & date to Indian Time format (doesn't modify in MongoDB database) *******/
+const { formatDate } = require("../utils/formatDate");
 
-    //validating name 
-    if(!req.body.name){
-        console.log("Name is not provided");
-        return res.status(400).send("Failed! Name is not provided")
+let validateUserRequestBody = async (req, res, next) => {
+  try {
+
+    let { name, userId, email, password } = req.body;
+    /**************  NAME VALIDATION  ****************** */
+    if (!name) {
+      console.log("\nName is not provided");
+      return res.status(400).send("Bad Request! Name not provided");
     }
 
-       //validating userId 
-       if(!req.body.userId){
-        console.log("userId is not provided");
-        return res.status(400).send("Failed! userId is not provided")
+    /**************  USERID VALIDATION  ****************** */
+    if (!userId) {
+      console.log("\nuserId is not provided");
+      return res.status(400).send("Bad Request! UserId not provided");
     }
 
-    const user = await User.findOne({userId:req.body.userId});
+    const user = await User.findOne({ userId: userId });
 
     //check whether UserId already exists in DB
-    if(user!=null){
-        const IndiaDateCreatedAt = formatDate(user.createdAt)
-        const IndiaDateUpdatedAt = formatDate(user.updatedAt)
-        const userData = {
-            name: user.name,
-            userId: user.userId,
-            email: user.email,
-            createdAt: IndiaDateCreatedAt,
-            updatedAt: IndiaDateUpdatedAt
-        }
-        console.log("userId already exists!", userData);
-        return res.status(400).send({
-            Message: "Failed!, userId already exists!"
-        });
+    if (user != null) {
+      const IndiaDateCreatedAt = formatDate(user.createdAt);
+      const IndiaDateUpdatedAt = formatDate(user.updatedAt);
+      const userData = {
+        name: user.name,
+        userId: user.userId,
+        email: user.email,
+        createdAt: IndiaDateCreatedAt,
+        updatedAt: IndiaDateUpdatedAt,
+      };
+      console.log("\nuserId with this data already exists!", userData);
+      return res.status(400).send(`Failed!, userId '${userData.userId}' already exists!`);
     }
 
-       //validating email 
-       if(!req.body.email){
-        console.log("email not provided");
-        return res.status(400).send("Failed! email is not provided")
+    /**************  EMAIL VALIDATION  ****************** */
+    //***  Check if email is provided by user or not in "req.body"   *********
+    if (!email) {
+      console.log("\nEmail not provided");
+      return res.status(400).send("Bad Request! Email not provided");
     }
 
-    const email = await User.findOne({email:req.body.email});
+    //*******  If email is provided by user, Check whether it is already exists in DB or not  *********
+    const emailReq = await User.findOne({ email: email });
 
-    //check whether EmailID already exists in DB
-    if(email!=null){
-        console.log("email already exists");
-        return res.status(400).send("Failed! email already exists");
+    if (emailReq != null) {
+      console.log("\nEmail \'"+email+ "\' already exists");
+      return res.status(400).send(`Failed! Email '${emailReq.email}' already exists`);
     }
 
-    //validating email 
-    if(!req.body.password){
-        console.log("password not provided");
-        return res.status(400).send("Failed! Password not provided");
+    /*************  PASSWORD VALIDATION  ***************** */
+    if (!req.body.password) {
+      console.log("\nPassword not provided");
+      return res.status(400).send("Bad Request! Password not provided");
     }
 
     next();
+  } catch (error) {
+    console.log("Error at validateUserRequestBody:", error.message);
+    res.status(400).send("Internal Error Occured!");
+  }
+};
 
-}
+/*******  EXPORT USER VALIDATION FUNCTIONS  **********/
 
-module.exports={
-    validateUserRequestBody
-}
+module.exports = {
+  validateUserRequestBody,
+};

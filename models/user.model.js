@@ -7,20 +7,20 @@ const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema({
     name:{
         type:String,
-        required:[true,'Please provide name']
+        required:[true,`NOT PROVIDED 😒`]
     },
     userId:{
         type:String,
-        required:[true,'Please provide userId'],
+        required:[true,`NOT PROVIDED 😕`],
         unique:true
     },
     password:{
         type:String,
-        required:[true,'Please provide password']
+        required:[true,`NOT PROVIDED 🙁`]
     },
     email:{
         type:String,
-        required:[true,'Please provide email'],
+        required:[true,`NOT PROVIDED 😠`],
         lowercase:true,
         unique:true
     },

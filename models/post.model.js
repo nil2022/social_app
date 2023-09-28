@@ -7,15 +7,15 @@ const mongoose = require("mongoose");
 const postSchema = new mongoose.Schema({
     title: {
         type: String,
-        required: [true,'Please provide title of post'],
+        required: [true,`NOT PROVIDED 😔`],
         unique:true
     },
     content: {
         type: String,
-        required: [true,'Please provide content']
+        required: [true,`NOT PROVIDED ☹️`]
     },
     user: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'User'
     },
     createdAt: {

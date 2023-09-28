@@ -5,21 +5,36 @@ const User = require("../models/user.model.js");
 const Post = require("../models/post.model.js");
 const jwt = require("jsonwebtoken");
 const { SECRET } = require("../configs/server.config.js");
-const { formatDate } = require("../utils/formatDate.js")  //to convert & view UTC date to Indian Time format (doesn't modify in MongoDB database)
+const { formatDate } = require("../utils/formatDate.js"); //to convert & view UTC date to Indian Time format (doesn't modify in MongoDB database)
 
 exports.signup = async (req, res) => {
-  const userObject = {
-    name: req.body.name,
-    userId: req.body.userId,
-    email: req.body.email,
-    password: bcrypt.hashSync(req.body.password, 10),
-  };
+
   try {
-    const user = await User.create(userObject);
-    console.log(user); //Displays the user created
-    res.status(201).send(user);
+    let { name, userId, email, password } = req.body;
+
+    const saltRounds = 10;
+    /***************  GENERATE HASH  ************* */
+    const hash = await bcrypt.hash(password, saltRounds);
+
+    const userCreated = await User.create({
+      name, 
+      userId, 
+      email, 
+      password:hash
+    });
+    
+    const IndiaDateCreatedAt = formatDate(userCreated.createdAt);
+    console.log(userCreated); //Displays the user created
+
+    res.status(201).send(['Message: User created Successfully',
+    { Name: userCreated.name, 
+      UserID: userCreated.userId, 
+      Email: userCreated.email, 
+      Created_At: IndiaDateCreatedAt 
+    }]);
+
   } catch (err) {
-    console.log("Error Occured!", err);
+    console.log("Error Occured!", err.message);
     res.status(500).send("Internal Server Error:");
   }
 };
@@ -27,7 +42,7 @@ exports.signup = async (req, res) => {
 exports.signin = async (req, res) => {
   try {
     const { userId, password } = req.body;
-
+    passwordHash();
     //verify whether the userId is correct or not
     const user = await User.findOne({ userId });
 
@@ -54,19 +69,19 @@ exports.signin = async (req, res) => {
     let token = jwt.sign({ userId: userId }, SECRET, {
       expiresIn: "12h", //12hours
     });
-        const IndiaDateCreatedAt = formatDate(user.createdAt)
-        const IndiaDateUpdatedAt = formatDate(user.updatedAt)
-        const userData = {
-            name: user.name,
-            userId: user.userId,
-            email: user.email,
-            createdAt: IndiaDateCreatedAt,
-            updatedAt: IndiaDateUpdatedAt
-        }
+    const IndiaDateCreatedAt = formatDate(user.createdAt);
+    const IndiaDateUpdatedAt = formatDate(user.updatedAt);
+    const userData = {
+      name: user.name,
+      userId: user.userId,
+      email: user.email,
+      createdAt: IndiaDateCreatedAt,
+      updatedAt: IndiaDateUpdatedAt,
+    };
     console.log("SignIn Req for:-\n", userData);
     res.status(200).send({
       Message: "Signed in Successfully!",
-      AccessToken: token
+      AccessToken: token,
     });
   } catch (error) {
     console.log("Error occured", error);
