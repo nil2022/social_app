@@ -1,4 +1,3 @@
-"use strict";
 require("dotenv").config();
 const bcrypt = require("bcrypt");
 const User = require("../models/user.model.js");
@@ -7,176 +6,194 @@ const jwt = require("jsonwebtoken");
 const { SECRET } = require("../configs/server.config.js");
 const { formatDate } = require("../utils/formatDate.js"); //to convert & view UTC date to Indian Time format (doesn't modify in MongoDB database)
 
+/**************  SIGNUP/REGISTER API ********************/
 exports.signup = async (req, res) => {
 
   try {
-    let { name, userId, email, password } = req.body;
+        // get the data from request body
+        let { name, userId, email, password } = req.body;
 
-    const saltRounds = 10;
-    /***************  GENERATE HASH  ************* */
-    const hash = await bcrypt.hash(password, saltRounds);
+        /************ GENERATE HASH FOR PASSWORD  *******************/
+        const hash = await bcrypt.hash(password, 10);
 
-    const userCreated = await User.create({
-      name, 
-      userId, 
-      email, 
-      password:hash
-    });
-    
-    const IndiaDateCreatedAt = formatDate(userCreated.createdAt);
-    console.log(userCreated); //Displays the user created
+        /************* STORE USER DATA TO DB  *************/
+        const userCreated = await User.create({
+          name, 
+          userId, 
+          email, 
+          password:hash
+        });
+        //CONVERT JSON DATE TO INDIA DATE FORMAT
+        const IndiaDateCreatedAt = formatDate(userCreated.createdAt);  
+        //Displays the user created
+        console.log(userCreated); 
 
-    res.status(201).send(['Message: User created Successfully',
-    { Name: userCreated.name, 
-      UserID: userCreated.userId, 
-      Email: userCreated.email, 
-      Created_At: IndiaDateCreatedAt 
-    }]);
+        /************* SEND RESPONSE TO USER ************/
+        res.status(201).send(['Message: User created Successfully',
+        { Name: userCreated.name, 
+          UserID: userCreated.userId, 
+          Email: userCreated.email, 
+          Created_At: IndiaDateCreatedAt 
+        }]);
 
-  } catch (err) {
-    console.log("Error Occured!", err.message);
-    res.status(500).send("Internal Server Error:");
-  }
+      } catch (err) {
+        console.log("Error Occured!", err.message);
+        res.status(500).send("Internal Server Error:");
+      }
 };
 
+/**************  SIGNIN  API ****************************/
 exports.signin = async (req, res) => {
+
   try {
-    const { userId, password } = req.body;
-    passwordHash();
-    //verify whether the userId is correct or not
-    const user = await User.findOne({ userId });
+        // GET DATA FROM REQUEST BODY
+        const { userId, password } = req.body;
 
-    if (!user) {
-      console.log("UserID doesn't exists");
-      return res.status(400).send("UserId doesn't exist in our server");
-    }
+        /***  CHECK FOR USERID IS PROVIDED IN REQUEST BODY OR NOT  ********************/
+        if (!userId) {
+          console.log("\nuserId is not provided");
+          return res.status(400).send("Bad Request! UserId not provided");
+        }
+      
+        //FETCH REQUESTED USER FROM DB
+        const user = await User.findOne({ userId: userId});
 
-    if (!password) {
-      console.log("Password not entered");
-      return res.status(400).send("Please enter the password");
-    }
+        /**** CHECK FOR USER EXISTS IN DB OR NOT  *********** */
+        if (!user) {
+          console.log("UserID doesn't exists");
+          return res.status(400).send("UserId doesn't exist in our server");
+        }
 
-    let isCorrectPassword = bcrypt.compareSync(
-      req.body.password,
-      user.password
-    );
+        /*** CHECK FOR PASSWORD IS PROVIDED IN REQUEST BODY OR NOT   ********* */
+        if (!password) {
+          console.log("Password not entered");
+          return res.status(400).send("Please enter the password");
+        }
 
-    if (!isCorrectPassword) {
-      console.log("Invalid Password");
-      return res.status(401).send("Invalid Password");
-    }
+        /*******  CHECK WHETHER PASSWORD IS MATCHING IN DB OR NOT  ***********/
+        let isCorrectPassword = await bcrypt.compare(password,user.password);
+        /*******  CHECK WHETHER PASSWORD IS CORRECT OR NOT  ***********/
+        if (!isCorrectPassword) {
+          console.log("Invalid Password");
+          return res.status(401).send("Invalid Password");
+        }
 
-    let token = jwt.sign({ userId: userId }, SECRET, {
-      expiresIn: "12h", //12hours
-    });
-    const IndiaDateCreatedAt = formatDate(user.createdAt);
-    const IndiaDateUpdatedAt = formatDate(user.updatedAt);
-    const userData = {
-      name: user.name,
-      userId: user.userId,
-      email: user.email,
-      createdAt: IndiaDateCreatedAt,
-      updatedAt: IndiaDateUpdatedAt,
-    };
-    console.log("SignIn Req for:-\n", userData);
-    res.status(200).send({
-      Message: "Signed in Successfully!",
-      AccessToken: token,
-    });
-  } catch (error) {
-    console.log("Error occured", error);
-    res.status(500).send("Internal Server Error");
-  }
+        /***** CREATE A ACCESS TOKEN  FOR THE USER  ************ */
+        let token = jwt.sign({ userId: userId }, SECRET, {
+          expiresIn: process.env.JWT_EXPIRY, 
+        });
+        
+        /**** CONVERT JSON DATE IN DB TO INDIA DATE FORMAT ***********/
+        const IndiaDateCreatedAt = formatDate(user.createdAt);
+        const IndiaDateUpdatedAt = formatDate(user.updatedAt);
+        /**** CREATE A USER OBJECT TO STRUCTURE THE DATA TO SEND TH RESPONSE TO USER  *****/
+        const userData = {
+          name: user.name,
+          userId: user.userId
+        };
+
+        /*****  SEND USER DATA IN RESPONSE FOR SIGNIN REQUESTED  ********/
+        console.log("SignIn Req for:", userData);
+        /*****  SEND ACCESS TOKEN TO USER FOR SIGNIN  *******/
+        res.status(200).send({
+          Message: "Signed in Successfully!",
+          AccessToken: token,
+        });
+      } catch (error) {
+        console.log("Error occured", error);
+        res.status(500).send("Internal Server Error");
+      }
 };
 
+/**************  CHANGE PASSWORD API*********************/
 exports.changePassword = async (req, res) => {
   try {
-    const { userId, password } = req.body;
+        // GET DATA FROM REQUEST BODY
+        const { userId, password } = req.body;
 
-    //verify whether the userId is correct or not
-    const userCheck = await User.findOne({
-      userId: userId,
-    });
+        //FETCH REQUESTED USER FROM DB
+        const userCheck = await User.findOne({
+          userId: userId,
+        });
 
-    if (!userCheck) {
-      console.log("UserID doesn't exists");
-      return res.status(400).send("UserId doesn't exist in our server");
-    }
+        /**** CHECK FOR USER EXISTS IN DB OR NOT  *********** */
+        if (!userCheck) {
+          console.log("UserID doesn't exists");
+          return res.status(400).send("UserId doesn't exist in our server");
+        }
 
-    if (!password) {
-      console.log("Password not entered");
-      return res.status(400).send("Please enter the password");
-    }
+        /*** CHECK FOR PASSWORD TO CHANGE, IS PROVIDED IN REQUEST BODY OR NOT   ********* */
+        if (!password) {
+          console.log("Password not entered");
+          return res.status(400).send("Please enter the password");
+        }
 
-    const user = await User.findOneAndUpdate(
-      {
-        userId: userId,
-      },
-      {
-        password: bcrypt.hashSync(password, 10),
-        updatedAt: Date.now(),
+        /************ GENERATE HASH FOR PASSWORD  *******************/
+        const hash = await bcrypt.hash(password, 10);
+
+        /************ FIND THE USER, CHANGE PASSWORD, & UPDATE IN DB *******************/
+        await User.findOneAndUpdate(
+          {
+            userId: userId,
+          },
+          {
+            password: hash,
+            updatedAt: Date.now(),
+          }
+        ).exec();
+
+        /***  LOG FOR SUCCESSFULL PASSWORD CHANGE  ****/
+        console.log(`Password for user '${userId}' updated!`);
+        /***  SEND RESPONSE TO USER FOR SUCCESSFULL PASSWORD CHANGE  ****/
+        res.status(200).send(`Password for user '${userId}' updated!`);
+
+      } catch (err) {
+        console.log("Error while updating the password", err.message);
+        res.status(500).send("Some internal error occured");
       }
-    ).exec();
-    console.log(`Password for user '${userId}' updated!`);
-    res.status(200).send(`Password for user '${userId}' updated!`);
-  } catch (err) {
-    console.log("Error while updating the record", err.message);
-    res.status(500).send("Some internal error occured");
-  }
 };
 
+/**************  DELETE USER API  *********************/
 exports.deleteUser = async (req, res) => {
   try {
-    const userIdReq = req.body.userId;
-    const passwordReq = req.body.password;
-    const tokenReq = req.headers["x-access-token"];
+        /**** GET USERID & PASSWORD FROM REQUEST BODY ********/
+        const {userId, password} = req.body;
+        /**** CHECK FOR USERID & PASSWORD PROVIDED BY USER OR NOT ********/
+        if (!userId || !password) {
+          console.log("UserID/Password not provided");
+          throw new Error("UserID/Password not provided");
+        }
 
-    if (!userIdReq || !passwordReq) {
-      console.log("UserID/Password not provided");
-      throw new Error("UserID/Password not provided");
-    }
+        //find the User in DB from requested userId
+        const user = await User.findOne({
+          userId: userId,
+        });
 
-    const tokenValidate = await jwt.verify(tokenReq, SECRET);
+        /******** CHECK WHETHER USER IN OUR DB OR NOT ***************/
+        if(user==null) {
+          console.log('User not found in DB/server');
+          return res.status(400).send('Requested user is not in our Server!')
+        }
 
-    console.log("userIdReq- ", userIdReq);
-    console.log("passwordReq- ", passwordReq);
-    //console.log("tokenReq- ", tokenReq);
-    console.log("tokenValidate.userId- ", tokenValidate.userId);
+        //check whether password provided is correct or not
+        let isPasswordValid = await bcrypt.compare(password, user.password);
+        if (isPasswordValid != true) throw new Error("Password not correct");
 
-    if (userIdReq == tokenValidate.userId)
-      console.log("userId and token matched");
-    else {
-      console.log("provided userId and token not matching");
-      throw new Error("provided userId and token not matching");
-    }
+        //check posts with userId provided in DB
+        await Post.find({ user: userId });
 
-    //find the User in DB from requested userIdReq
-    const user = await User.findOne({
-      userId: userIdReq,
-    });
-    console.log(user);
-    console.log("user.password-", user.password);
+        //deletes all posts of provided userId
+        Post.deleteMany({ user: userId }).exec();
 
-    //check whether password provided is correct or not
-    let passwordIsValid = await bcrypt.compare(passwordReq, user.password);
-    if (passwordIsValid != true) throw new Error("Password mismatch");
-    console.log("Password matched");
+        //deletes the user with provided userId
+        User.findOneAndDelete({ userId: userId }).exec();
+        
+        console.log(`User with userId '${userId}' and all it's data are deleted`);
+        /********  SEND RESPONSE TO USER ABOUT DELETION  **************/
+        res.status(200).send(`User with userId '${userId}' and all it's data are deleted`);
 
-    //check posts with userId provided in DB
-    const posts = await Post.find({
-      user: userIdReq,
-    });
-
-    //deletes all posts of provided userId
-    Post.deleteMany({ user: userIdReq }).exec();
-
-    //deletes the user with provided userId
-    User.findOneAndDelete({ userId: userIdReq }).exec();
-    //console.log(posts);
-    res.status(200).send(`All Posts of ${userIdReq} are deleted,
-                                  User with userId '${userIdReq}' is deleted`);
-  } catch (err) {
-    console.log("Error: ", err.message);
-    res.status(400).send(err.message);
-  }
+      } catch (err) {
+        console.log("Error: ", err.message);
+        res.status(400).send(err.message);
+      }
 };

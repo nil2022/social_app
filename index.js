@@ -1,4 +1,3 @@
-'use strict';
 require('dotenv').config() //needed to fetch data from .env file
 const express = require('express')
 
@@ -22,7 +21,7 @@ const connectDB = async () => {
       useUnifiedTopology: true
     });
     console.timeEnd('Mongodb connection time:');
-    console.log(`\nMongoDB Connected to Host: ${connect.connection.host}`);
+    console.log(`MongoDB Connected to Host: ${connect.connection.host}`);
   } catch (error) {
     console.timeEnd();
     console.log("Can't connect to DB:", error.message);
@@ -32,20 +31,14 @@ const connectDB = async () => {
 // FIRST CONNECT TO MONGODB THEN START LISTENING TO REQUESTS
 connectDB().then(() => {
   app.listen(PORT, () => {
-      console.log(`\nListening all requests on port ${PORT}`);
+      console.log(`Listening all requests on port ${PORT}`);
   })
 }).catch((e)=>console.log(e)) // IF DB CONNECT FAILED, CATCH ERROR
 
 
 /**************************HOME PAGE**************************** */
 app.get('/', (req, res) => {
-  const ip = userIP(req);
-  console.log("Client Request IP:",ip);
-  res.status(200).send(`
-  <div style="padding:0.5rem; margin:auto">
-    <h2>Social App Backend Running Good 🎉</h2>  
-  </div>
-  `)
+  res.status(200).send(`<h2>Backend Running! 🎉</h2>`)
 });
 
 /**************  IMPORT API's ********** */

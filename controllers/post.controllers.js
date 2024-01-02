@@ -1,29 +1,24 @@
-'use strict';
+require('dotenv').config()
 const Post = require('../models/post.model');
 const User = require('../models/user.model')
 const jwt = require('jsonwebtoken');
-require('dotenv').config()
 const { SECRET } = require('../configs/server.config.js')
 const { formatDate } = require("../utils/formatDate")  //to convert & view UTC date to Indian Time format (doesn't modify in MongoDB database)
 
+/********* STORE POST TO DB REQUESTED BY USER *********/
 exports.addPost = async (req, res) => {
     try {
+        // Extract the post data from the request body
+        const { title, content } = req.body;
         // Verify that the user is authenticated by checking the JWT token in the Authorization header
         let token = req.headers['x-access-token'];
 
         const decoded = jwt.verify(token, SECRET);
-        //console.log(decoded);
-        const user = await User.findOne({
-            userId: decoded.userId
-        });
-
-        // Extract the post data from the request body
-        const { title, content } = req.body;
+        // console.log(decoded);
+        const user = await User.findOne({ userId: decoded.userId });
 
         //check if title of post is already in DB or not
-        const titleCheck = await Post.findOne({
-            title: title
-        })
+        const titleCheck = await Post.findOne({ title: title })
 
         if(titleCheck) {
             console.log("Title already in DB, create unique title");
@@ -31,16 +26,15 @@ exports.addPost = async (req, res) => {
         }
 
         // Create a new post with the user ID included
-        const post = new Post({
+        const createPost = new Post({
             title,
-            content,
-            user: user.userId
+            content
         });
 
         // Save the post to the database
-        await post.save();
-        console.log("Post created successfully", post);
-        res.status(201).json({ message: 'Post created successfully', post });
+        await createPost.save();
+        console.log("Post created successfully", createPost);
+        res.status(201).send({Message: "Post created successfully",createPost});
 
     } catch (error) {
         console.log("Error at post.controller:", error.message);
@@ -65,8 +59,10 @@ exports.getPostByUserId = async (req, res) => {
             return res.status(401).send('Unauthorized User!');
         } 
         
+        const user = await User.findOne({ userId: decoded.userId });
+
         const posts = await Post.find({
-            user: req.body.userId
+            user: user._id
         });
 
         // Check if any posts were found
@@ -84,7 +80,6 @@ exports.getPostByUserId = async (req, res) => {
                 id: element._id,
                 title: element.title,
                 content: element.content,
-                user: element.user,
                 createdAt: IndiaDateCreatedAt,
                 updatedAt: IndiaDateUpdatedAt
             }
@@ -105,7 +100,7 @@ exports.getPostByUserId = async (req, res) => {
     //    // res.status(200).send(postData);
 
     } catch (err) {
-        console.error("Internal Error:",err);
+        console.error("Internal Error:",err.message);
         res.status(500).send("Internal Server Error");
     }
 };
@@ -160,3 +155,16 @@ exports.deleteAllPostsByUserId = async (req, res) => {
         return res.status(500).send("Internal Server Error")
     }
 }
+
+
+/***  TEST DATA USING AXIOS   CONTROLLER**** */
+// exports.getData = async (req, res) => {
+//     try {
+//         const posts = await Post.find();
+//         res.status(200).send(posts);
+
+//     } catch (error) {
+//         console.log('Error:', error);
+//         res.status(500).send('Internal Error')
+//     }
+// }

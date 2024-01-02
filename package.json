@@ -3,14 +3,16 @@
   "version": "1.0.2",
   "description": "A Social app developed using Express, jsonwebtoken, mongoose",
   "main": "index.js",
+  "type": "commonjs",
   "scripts": {
-    "build": "npm install bcrypt body-parser dotenv express jsonwebtoken mongoose node-rest-client nodemon moment-timezone user-ip --save",
+    "build": "npm install bcrypt body-parser dotenv express jsonwebtoken mongoose node-rest-client moment-timezone user-ip axios node-fetch --save",
     "start": "node ./index.js",
     "dev": "nodemon ./index.js"
   },
   "author": "Nilanjan",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.5.1",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "dotenv": "^16.3.1",
@@ -18,9 +20,12 @@
     "jsonwebtoken": "^9.0.2",
     "moment-timezone": "^0.5.43",
     "mongoose": "^7.5.3",
+    "node-fetch": "^2.7.0",
     "node-rest-client": "^3.1.1",
-    "nodemon": "^3.0.1",
     "user-ip": "^1.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   },
   "keywords": [
     "mongodb",
@@ -36,6 +41,9 @@
     "nodemon",
     "moment-timezone"
   ],
+  "engines": {
+    "node": ">=18.19.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nil2022/instagram_clone.git"

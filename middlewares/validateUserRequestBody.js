@@ -4,6 +4,7 @@ const User = require("../models/user.model");
 /*********** Convert & View UTC Time & date to Indian Time format (doesn't modify in MongoDB database) *******/
 const { formatDate } = require("../utils/formatDate");
 
+/*** VALIDATE DETAILS PROVIDED BY USER ******/
 let validateUserRequestBody = async (req, res, next) => {
   try {
 
@@ -53,12 +54,13 @@ let validateUserRequestBody = async (req, res, next) => {
     }
 
     /*************  PASSWORD VALIDATION  ***************** */
-    if (!req.body.password) {
+    if (!password) {
       console.log("\nPassword not provided");
       return res.status(400).send("Bad Request! Password not provided");
     }
 
     next();
+    
   } catch (error) {
     console.log("Error at validateUserRequestBody:", error.message);
     res.status(400).send("Internal Error Occured!");
@@ -66,7 +68,6 @@ let validateUserRequestBody = async (req, res, next) => {
 };
 
 /*******  EXPORT USER VALIDATION FUNCTIONS  **********/
-
 module.exports = {
   validateUserRequestBody,
 };

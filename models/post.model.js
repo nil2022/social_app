@@ -1,7 +1,7 @@
-'use strict';
 
 //import mongoose
 const mongoose = require("mongoose");
+const User = require('./user.model')
 
 //route handler
 const postSchema = new mongoose.Schema({
@@ -15,8 +15,9 @@ const postSchema = new mongoose.Schema({
         required: [true,`NOT PROVIDED ☹️`]
     },
     user: {
-        type: String,
-        ref: 'User'
+        type: mongoose.Schema.Types.ObjectId,
+        required:true,
+        ref: "User"
     },
     createdAt: {
         type: Date,
