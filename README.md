@@ -1,4 +1,11 @@
 # Social App <img src="./assets/instagram_2111463.png" width=30px height=30px>
+
+<p align="left" >
+<!-- Node.js Vulnerability Check -->
+<a href="https://github.com/nil2022/social_app/actions/workflows/main.yml" target="_blank"> <img src="https://github.com/nil2022/social_app/actions/workflows/main.yml/badge.svg?branch=master" alt="Node.js Vulnerability Check" /></a><!-- CodeQL --> <a href="https://github.com/nil2022/social_app/actions/workflows/github-code-scanning/codeql" target="_blank"><img src="https://github.com/nil2022/social_app/actions/workflows/github-code-scanning/codeql/badge.svg?branch=master" alt="CodeQL" /></a>
+</a>
+</p>
+
 **v1.0.2**
 
 This app is build using Backend Development tools like 
