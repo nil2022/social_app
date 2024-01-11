@@ -1,46 +1,41 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/configuration-reference
+# CircleCI workflow config file
 version: 2.1
+orbs:
+  node: circleci/node@5.0.2
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/configuration-reference/#jobs
 jobs:
-  check-node-version:
-    runs-on: ubuntu-latest
-
+  build_and_test:
+    executor: node/default
     steps:
-    - checkout
-    - run:
-        # Check Node version 
-        name: "Check Node.js version"
-        command: "node --version"
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          command: node -v
+          name: Check Node.js Version
+      # - run:
+      #     command: yarn build
+      #     name: Build app
+      # - persist_to_workspace:
+      #     root: ~/project
+      #     paths:
+      #       - .
 
-    - name: Use Node.js
-      uses: actions/setup-node@v4
-    
-    - name: Check Node.js version
-      run: |
-        node --version
-    
-    workflows:
-      check-node-version-workflow:
-        jobs:
-          - check-node-version
-#     # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
-#     # See: https://circleci.com/docs/configuration-reference/#executor-job
-#     docker:
-#       - image: cimg/base:stable
-#     # Add steps to the job
-#     # See: https://circleci.com/docs/configuration-reference/#steps
-#     steps:
-#       - checkout
-#       - run:
-#           name: "Say hello"
-#           command: "echo Hello, World!"
+  # deploy: # this can be any name you choose
+  #   executor: heroku/default
+  #   steps:
+  #     - attach_workspace:
+  #         at: ~/project
+  #     - heroku/deploy-via-git:
+  #         force: true # force push when pushing to the heroku remote, see: https://devcenter.heroku.com/articles/git
 
-# # Orchestrate jobs using workflows
-# # See: https://circleci.com/docs/configuration-reference/#workflows
-# workflows:
-#   say-hello-workflow:
-#     jobs:
-#       - say-hello
+workflows:
+  test_my_app:
+    jobs:
+      - build_and_test
+      # - deploy:
+      #     requires:
+      #       - build_and_test # only deploy if the build_and_test job has completed
+      #     filters:
+      #       branches:
+      #         only: main # only deploy when on main
