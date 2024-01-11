@@ -11,7 +11,8 @@ const userSchema = new mongoose.Schema({
     userId:{
         type:String,
         required:[true,`NOT PROVIDED 😕`],
-        unique:true
+        unique:true,
+        lowercase:true
     },
     password:{
         type:String,

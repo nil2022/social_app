@@ -1,9 +1,9 @@
 require('dotenv').config() //needed to fetch data from .env file
 const express = require('express')
-
 const mongoose = require('mongoose')
-
 const userIP = require('user-ip');
+const cookieParser = require('cookie-parser');
+const securedHeaders = require('helmet');
 
 const { PORT } = require('./configs/server.config.js')
 const app = express()
@@ -11,14 +11,16 @@ const db_url = process.env.DB_URL || `mongodb://127.0.0.1:27017/${process.env.DB
 
 app.use(express.urlencoded({extended:true}));
 app.use(express.json());
+app.use(cookieParser());
+app.use(securedHeaders());
 
 // connect to MongoDB
 // Event handlers for successful connection and connection error
 const connectDB = async () => {
   try { console.time('Mongodb connection time:');
     const connect = await mongoose.connect(db_url,{
-      useNewUrlParser: true,
-      useUnifiedTopology: true
+      // useNewUrlParser: true, // DEPRECATED
+      // useUnifiedTopology: true  // DEPRECATED
     });
     console.timeEnd('Mongodb connection time:');
     console.log(`MongoDB Connected to Host: ${connect.connection.host}`);
