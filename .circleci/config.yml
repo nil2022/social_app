@@ -1,10 +1,11 @@
 # CircleCI workflow config file
 version: 2.1
+
 orbs:
   node: circleci/node@5.0.2
 
 jobs:
-  build_and_test:
+  check-node-version:
     executor: node/default
     steps:
       - checkout
@@ -13,9 +14,26 @@ jobs:
       - run:
           command: node -v
           name: Check Node.js Version
-      # - run:
-      #     command: yarn build
-      #     name: Build app
+
+  check-vulnerabilities:
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          command: npm audit fix --force --json
+          name: Fix Vulnerabilities
+
+  build-app:
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          command: npm install
+          name: Build app
       # - persist_to_workspace:
       #     root: ~/project
       #     paths:
@@ -30,9 +48,11 @@ jobs:
   #         force: true # force push when pushing to the heroku remote, see: https://devcenter.heroku.com/articles/git
 
 workflows:
-  test_my_app:
+  check-fix-build-app:
     jobs:
-      - build_and_test
+      - check-node-version
+      - check-vulnerabilities
+      - build-app
       # - deploy:
       #     requires:
       #       - build_and_test # only deploy if the build_and_test job has completed
