@@ -7,7 +7,6 @@ const { formatDate } = require("../utils/formatDate");
 /*** VALIDATE DETAILS PROVIDED BY USER ******/
 let validateUserRequestBody = async (req, res, next) => {
   try {
-
     let { name, userId, email, password } = req.body;
     /**************  NAME VALIDATION  ****************** */
     if (!name) {
@@ -35,7 +34,9 @@ let validateUserRequestBody = async (req, res, next) => {
         updatedAt: IndiaDateUpdatedAt,
       };
       console.log("\nuserId with this data already exists!", userData);
-      return res.status(400).send(`Failed!, userId '${userData.userId}' already exists!`);
+      return res
+        .status(400)
+        .send(`Failed!, userId '${userData.userId}' already exists!`);
     }
 
     /**************  EMAIL VALIDATION  ****************** */
@@ -49,8 +50,10 @@ let validateUserRequestBody = async (req, res, next) => {
     const emailReq = await User.findOne({ email: email });
 
     if (emailReq != null) {
-      console.log("\nEmail \'"+email+ "\' already exists");
-      return res.status(400).send(`Failed! Email '${emailReq.email}' already exists`);
+      console.log("\nEmail '" + email + "' already exists");
+      return res
+        .status(400)
+        .send(`Failed! Email '${emailReq.email}' already exists`);
     }
 
     /*************  PASSWORD VALIDATION  ***************** */
@@ -60,7 +63,6 @@ let validateUserRequestBody = async (req, res, next) => {
     }
 
     next();
-    
   } catch (error) {
     console.log("Error at validateUserRequestBody:", error.message);
     res.status(400).send("Internal Error Occured!");
