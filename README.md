@@ -2,7 +2,7 @@
 
 <p align="left" >
 <!-- Node.js Vulnerability Check -->
-<a href="https://github.com/nil2022/social_app/actions/workflows/main.yml" target="_blank"> <img src="https://github.com/nil2022/social_app/actions/workflows/main.yml/badge.svg?branch=master" alt="Node.js Vulnerability Check" /></a><!-- CodeQL --> <a href="https://github.com/nil2022/social_app/actions/workflows/github-code-scanning/codeql" target="_blank"><img src="https://github.com/nil2022/social_app/actions/workflows/github-code-scanning/codeql/badge.svg?branch=master" alt="CodeQL" /></a>
+<a href="https://dl.circleci.com/status-badge/redirect/gh/nil2022/social_app/tree/master" target="_blank"> <img src="https://dl.circleci.com/status-badge/img/gh/nil2022/social_app/tree/master.svg?style=svg" alt="CircleCI" /></a><!-- CodeQL --> <a href="https://github.com/nil2022/social_app/actions/workflows/github-code-scanning/codeql" target="_blank"><img src="https://github.com/nil2022/social_app/actions/workflows/github-code-scanning/codeql/badge.svg?branch=master" alt="CodeQL" /></a>
 </a>
 </p>
 
