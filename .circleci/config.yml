@@ -1,7 +1,7 @@
 # CircleCI workflow config file
 version: 2.1
 orbs:
-  node: circleci/node@5.0.2
+  node: circleci/node@5.2.0
 
 jobs:
   build_and_test:
