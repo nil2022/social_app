@@ -5,17 +5,7 @@ orbs:
   node: circleci/node@5.2.0
 
 jobs:
-  check-node-version:
-    executor: node/default
-    steps:
-      - checkout
-      - node/install-packages:
-          pkg-manager: npm
-      - run:
-          command: node -v
-          name: Check Node.js Version
-
-  check-vulnerabilities:
+  fix-vulnerabilities:
     executor: node/default
     docker:
       - image: cimg/node:20.11.0-browsers
@@ -24,18 +14,23 @@ jobs:
       - node/install-packages:
           pkg-manager: npm
       - run:
-          command: npm audit fix --force --json
+          name: Run Vulnerability Scan
+          command: npm audit --json
+      - run:
           name: Fix Vulnerabilities
-
+          command: npm audit fix --force --json
+          
   build-app:
     executor: node/default
+    docker:
+      - image: cimg/node:20.11.0-browsers
     steps:
       - checkout
       - node/install-packages:
           pkg-manager: npm
       - run:
-          command: npm install
           name: Build app
+          command: npm install
       # - persist_to_workspace:
       #     root: ~/project
       #     paths:
@@ -52,8 +47,7 @@ jobs:
 workflows:
   check-fix-build-app:
     jobs:
-      - check-node-version
-      - check-vulnerabilities
+      - fix-vulnerabilities
       - build-app
       # - deploy:
       #     requires:
