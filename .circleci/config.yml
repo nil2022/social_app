@@ -18,7 +18,7 @@ jobs:
   check-vulnerabilities:
     executor: node/default
     docker:
-      - image: circleci/node:5.0.2
+      - image: cimg/node:5.0.2
     steps:
       - checkout
       - node/install-packages:
