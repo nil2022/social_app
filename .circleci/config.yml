@@ -31,11 +31,6 @@ jobs:
       - run:
           name: Build app
           command: npm install
-              requires:
-                - fix-vulnerabilities
-              filters:
-                branches:
-                  only: master
       # - persist_to_workspace:
       #     root: ~/project
       #     paths:
@@ -53,7 +48,12 @@ workflows:
   check-fix-build-app:
     jobs:
       - fix-vulnerabilities
-      - build-app
+      - build-app:
+          requires:
+            - fix-vulnerabilities
+          filters:
+            branches:
+              only: master
       # - deploy:
       #     requires:
       #       - build_and_test # only deploy if the build_and_test job has completed
