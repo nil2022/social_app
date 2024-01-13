@@ -48,7 +48,12 @@ workflows:
   check-fix-build-app:
     jobs:
       - fix-vulnerabilities
-      - build-app
+      - build-app:
+          requires:
+            - fix-vulnerabilities
+          filters:
+            branches:
+              only: master
       # - deploy:
       #     requires:
       #       - build_and_test # only deploy if the build_and_test job has completed
