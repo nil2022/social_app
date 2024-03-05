@@ -28,17 +28,15 @@ exports.signup = async (req, res) => {
     console.log(userCreated);
 
     /************* SEND RESPONSE TO USER ************/
-    res
-      .status(201)
-      .send([
-        "Message: User created Successfully",
-        {
-          Name: userCreated.name,
-          UserID: userCreated.userId,
-          Email: userCreated.email,
-          Created_At: IndiaDateCreatedAt,
-        },
-      ]);
+    res.status(201).send([
+      "Message: User created Successfully",
+      {
+        Name: userCreated.name,
+        UserID: userCreated.userId,
+        Email: userCreated.email,
+        Created_At: IndiaDateCreatedAt,
+      },
+    ]);
   } catch (err) {
     console.log("Error Occured!", err.message);
     res.status(500).send("Internal Server Error:");
