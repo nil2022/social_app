@@ -7,7 +7,7 @@
   "scripts": {
     "build": "npm install bcrypt body-parser dotenv express jsonwebtoken mongoose node-rest-client moment-timezone user-ip axios node-fetch --save",
     "start": "node ./index.js",
-    "dev": "nodemon ./index.js",
+    "dev": "nodemon --watch .env --watch ./ --exec node index.js",
     "prettier": "prettier --write \"./**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "prettier-check": "prettier --check \"./**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
   },
