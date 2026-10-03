@@ -14,12 +14,12 @@ exports.addPost = async (req, res) => {
     if (!isNonEmptyString(title) || !isNonEmptyString(content)) {
       return res.status(400).send("Bad Request! Title/Content not provided");
     }
-    // Verify that the user is authenticated by checking the JWT token in the Authorization header
-    let token = req.headers["x-access-token"];
-
-    const decoded = jwt.verify(token, JWT_SECRET_KEY);
-    // console.log(decoded);
-    const user = await User.findOne({ userId: { $eq: decoded.userId } });
+    // req.userId is set by the verifyToken middleware from the verified JWT
+    const user = await User.findOne({ userId: { $eq: req.userId } });
+    if (!user) {
+      console.log("User from token not found in DB");
+      return res.status(401).send("Unauthorized User!");
+    }
 
     //check if title of post is already in DB or not
     const titleCheck = await Post.findOne({ title: { $eq: title } });
@@ -29,10 +29,11 @@ exports.addPost = async (req, res) => {
       return res.status(409).send("Title already in DB, create unique title");
     }
 
-    // Create a new post with the user ID included
+    // Create a new post owned by the authenticated user
     const createPost = new Post({
       title,
       content,
+      user: user._id,
     });
 
     // Save the post to the database
@@ -109,13 +110,25 @@ exports.deletePostByPostTitle = async (req, res) => {
   const titleReq = req.query.title;
   try {
     if (!isNonEmptyString(titleReq))
-      throw new Error("Title of post not provided");
+      return res.status(400).send("Title of post not provided");
 
+    // req.userId is set by the verifyToken middleware from the verified JWT
+    const user = await User.findOne({ userId: { $eq: req.userId } });
+    if (!user) {
+      console.log("User from token not found in DB");
+      return res.status(401).send("Unauthorized User!");
+    }
+
+    // A user can delete only his/her own posts
     const post = await Post.findOneAndDelete({
       title: { $eq: titleReq },
+      user: { $eq: user._id },
     }).exec();
 
-    if (post == null) throw new Error("Post is null/Post is not in server");
+    if (post == null) {
+      console.log("Post not found for this user");
+      return res.status(404).send("Post not found!");
+    }
 
     console.log(`Post Deleted for Title: "${post.title}"`);
     return res.status(200).send("Post Deleted Successfully!");
