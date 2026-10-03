@@ -3,6 +3,7 @@ const Post = require("../models/post.model");
 const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET_KEY } = require("../configs/server.config.js");
+const { isNonEmptyString } = require("../utils/sanitize");
 const { formatDate } = require("../utils/formatDate"); //to convert & view UTC date to Indian Time format (doesn't modify in MongoDB database)
 
 /********* STORE POST TO DB REQUESTED BY USER *********/
@@ -10,15 +11,18 @@ exports.addPost = async (req, res) => {
   try {
     // Extract the post data from the request body
     const { title, content } = req.body;
+    if (!isNonEmptyString(title) || !isNonEmptyString(content)) {
+      return res.status(400).send("Bad Request! Title/Content not provided");
+    }
     // Verify that the user is authenticated by checking the JWT token in the Authorization header
     let token = req.headers["x-access-token"];
 
     const decoded = jwt.verify(token, JWT_SECRET_KEY);
     // console.log(decoded);
-    const user = await User.findOne({ userId: decoded.userId });
+    const user = await User.findOne({ userId: { $eq: decoded.userId } });
 
     //check if title of post is already in DB or not
-    const titleCheck = await Post.findOne({ title: title });
+    const titleCheck = await Post.findOne({ title: { $eq: title } });
 
     if (titleCheck) {
       console.log("Title already in DB, create unique title");
@@ -51,18 +55,16 @@ exports.getPostByUserId = async (req, res) => {
     // console.log(decoded);
     // console.log("decoded.id", decoded.userId);
 
-    if (!req.body.userId) throw new Error(); //if no id is provided
+    if (!isNonEmptyString(req.body.userId)) throw new Error(); //if no id is provided
 
     if (decoded.userId != req.body.userId) {
       console.log("Unauthorized User/User not in our Server");
       return res.status(401).send("Unauthorized User!");
     }
 
-    const user = await User.findOne({ userId: decoded.userId });
+    const user = await User.findOne({ userId: { $eq: decoded.userId } });
 
-    const posts = await Post.find({
-      user: user._id,
-    });
+    const posts = await Post.find({ user: { $eq: user._id } });
 
     // Check if any posts were found
     if (posts.length === 0) {
@@ -106,16 +108,17 @@ exports.getPostByUserId = async (req, res) => {
 exports.deletePostByPostTitle = async (req, res) => {
   const titleReq = req.query.title;
   try {
-    if (!titleReq) throw new Error("Title of post not provided");
+    if (!isNonEmptyString(titleReq))
+      throw new Error("Title of post not provided");
 
-    const post = await Post.findOneAndDelete({ title: titleReq }).exec();
+    const post = await Post.findOneAndDelete({
+      title: { $eq: titleReq },
+    }).exec();
 
     if (post == null) throw new Error("Post is null/Post is not in server");
 
-    console.log(`Post Deleted for Title: "${titleReq}"`);
-    return res
-      .status(200)
-      .send(`Post Deleted Successfully! for Title: "${titleReq}"`);
+    console.log(`Post Deleted for Title: "${post.title}"`);
+    return res.status(200).send("Post Deleted Successfully!");
   } catch (err) {
     console.log("Error deleting post: ", err.message);
     return res.status(500).send("Internal Server Error");
@@ -129,21 +132,17 @@ exports.deleteAllPostsByUserId = async (req, res) => {
     const token = req.headers["x-access-token"];
     const decoded = jwt.verify(token, JWT_SECRET_KEY);
 
-    const user = await User.findOne({
-      userId: decoded.id,
-    });
+    const user = await User.findOne({ userId: { $eq: decoded.userId } });
 
     const userId = user._id.toString(); //convert ObjectId to String
 
-    const posts = await Post.find({
-      user: userId,
-    });
+    const posts = await Post.find({ user: { $eq: userId } });
 
     if (posts.length === 0) {
       console.log(`No posts with user: ${user.name}`);
       return res.status(200).send(`No posts with user: ${user.name}`);
     }
-    Post.deleteMany({ user: userId }).exec();
+    await Post.deleteMany({ user: { $eq: userId } }).exec();
     console.log(`All Posts of '${user.name}' with Id: ${userId} are deleted`);
     return res.status(200).send(`All Posts of '${user.name}' are deleted`);
   } catch (err) {

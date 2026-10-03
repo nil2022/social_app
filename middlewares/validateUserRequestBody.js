@@ -1,5 +1,6 @@
 "use strict";
 const User = require("../models/user.model");
+const { isNonEmptyString } = require("../utils/sanitize");
 
 /*********** Convert & View UTC Time & date to Indian Time format (doesn't modify in MongoDB database) *******/
 const { formatDate } = require("../utils/formatDate");
@@ -9,18 +10,18 @@ let validateUserRequestBody = async (req, res, next) => {
   try {
     let { name, userId, email, password } = req.body;
     /**************  NAME VALIDATION  ****************** */
-    if (!name) {
+    if (!isNonEmptyString(name)) {
       console.log("\nName is not provided");
       return res.status(400).send("Bad Request! Name not provided");
     }
 
     /**************  USERID VALIDATION  ****************** */
-    if (!userId) {
+    if (!isNonEmptyString(userId)) {
       console.log("\nuserId is not provided");
       return res.status(400).send("Bad Request! UserId not provided");
     }
 
-    const user = await User.findOne({ userId: userId });
+    const user = await User.findOne({ userId: { $eq: userId } });
 
     //check whether UserId already exists in DB
     if (user != null) {
@@ -41,13 +42,13 @@ let validateUserRequestBody = async (req, res, next) => {
 
     /**************  EMAIL VALIDATION  ****************** */
     //***  Check if email is provided by user or not in "req.body"   *********
-    if (!email) {
+    if (!isNonEmptyString(email)) {
       console.log("\nEmail not provided");
       return res.status(400).send("Bad Request! Email not provided");
     }
 
     //*******  If email is provided by user, Check whether it is already exists in DB or not  *********
-    const emailReq = await User.findOne({ email: email });
+    const emailReq = await User.findOne({ email: { $eq: email } });
 
     if (emailReq != null) {
       console.log("\nEmail '" + email + "' already exists");
@@ -57,7 +58,7 @@ let validateUserRequestBody = async (req, res, next) => {
     }
 
     /*************  PASSWORD VALIDATION  ***************** */
-    if (!password) {
+    if (!isNonEmptyString(password)) {
       console.log("\nPassword not provided");
       return res.status(400).send("Bad Request! Password not provided");
     }
