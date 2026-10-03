@@ -15,11 +15,9 @@ jobs:
           pkg-manager: npm
       - run:
           name: Run Vulnerability Scan
-          command: npm audit --json
-      - run:
-          name: Fix Vulnerabilities
-          command: npm audit fix --force --json
-          
+          # Fail only on high/critical issues in runtime dependencies (dev tooling is not shipped)
+          command: npm audit --omit=dev --audit-level=high
+
   build-app:
     executor: node/default
     docker:

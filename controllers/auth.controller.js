@@ -4,6 +4,7 @@ const User = require("../models/user.model.js");
 const Post = require("../models/post.model.js");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET_KEY } = require("../configs/server.config.js");
+const { isNonEmptyString } = require("../utils/sanitize.js");
 const { formatDate } = require("../utils/formatDate.js"); //to convert & view UTC date to Indian Time format (doesn't modify in MongoDB database)
 
 /**************  SIGNUP/REGISTER API ********************/
@@ -11,6 +12,10 @@ exports.signup = async (req, res) => {
   try {
     // get the data from request body
     let { name, userId, email, password } = req.body;
+
+    if (![name, userId, email, password].every(isNonEmptyString)) {
+      return res.status(400).send("Bad Request! Invalid input");
+    }
 
     /************ GENERATE HASH FOR PASSWORD  *******************/
     const hash = await bcrypt.hash(password, 10);
@@ -50,24 +55,24 @@ exports.signin = async (req, res) => {
     const { userId, password } = req.body;
 
     /***  CHECK FOR USERID IS PROVIDED IN REQUEST BODY OR NOT  ********************/
-    if (!userId) {
+    if (!isNonEmptyString(userId)) {
       console.log("\nuserId is not provided");
       return res.status(400).send("Bad Request! UserId not provided");
     }
 
+    /*** CHECK FOR PASSWORD IS PROVIDED IN REQUEST BODY OR NOT   ********* */
+    if (!isNonEmptyString(password)) {
+      console.log("Password not entered");
+      return res.status(400).send("Please enter the password");
+    }
+
     //FETCH REQUESTED USER FROM DB
-    const user = await User.findOne({ userId: userId });
+    const user = await User.findOne({ userId: { $eq: userId } });
 
     /**** CHECK FOR USER EXISTS IN DB OR NOT  *********** */
     if (!user) {
       console.log("UserID doesn't exists");
       return res.status(400).send("UserId doesn't exist in our server");
-    }
-
-    /*** CHECK FOR PASSWORD IS PROVIDED IN REQUEST BODY OR NOT   ********* */
-    if (!password) {
-      console.log("Password not entered");
-      return res.status(400).send("Please enter the password");
     }
 
     /*******  CHECK WHETHER PASSWORD IS MATCHING IN DB OR NOT  ***********/
@@ -111,10 +116,20 @@ exports.changePassword = async (req, res) => {
     // GET DATA FROM REQUEST BODY
     const { userId, password } = req.body;
 
+    /*** CHECK FOR USERID & PASSWORD TO CHANGE, ARE PROVIDED IN REQUEST BODY OR NOT   ********* */
+    if (!isNonEmptyString(userId) || !isNonEmptyString(password)) {
+      console.log("UserID/Password not provided");
+      return res.status(400).send("Please enter the userId and password");
+    }
+
+    /*** A USER CAN CHANGE ONLY HIS/HER OWN PASSWORD (userId comes from verified token)  ********* */
+    if (userId.toLowerCase() !== req.userId) {
+      console.log("UserID doesn't match with the token");
+      return res.status(403).send("You can change only your own password");
+    }
+
     //FETCH REQUESTED USER FROM DB
-    const userCheck = await User.findOne({
-      userId: userId,
-    });
+    const userCheck = await User.findOne({ userId: { $eq: req.userId } });
 
     /**** CHECK FOR USER EXISTS IN DB OR NOT  *********** */
     if (!userCheck) {
@@ -122,20 +137,12 @@ exports.changePassword = async (req, res) => {
       return res.status(400).send("UserId doesn't exist in our server");
     }
 
-    /*** CHECK FOR PASSWORD TO CHANGE, IS PROVIDED IN REQUEST BODY OR NOT   ********* */
-    if (!password) {
-      console.log("Password not entered");
-      return res.status(400).send("Please enter the password");
-    }
-
     /************ GENERATE HASH FOR PASSWORD  *******************/
     const hash = await bcrypt.hash(password, 10);
 
     /************ FIND THE USER, CHANGE PASSWORD, & UPDATE IN DB *******************/
     await User.findOneAndUpdate(
-      {
-        userId: userId,
-      },
+      { userId: { $eq: req.userId } },
       {
         password: hash,
         updatedAt: Date.now(),
@@ -143,9 +150,9 @@ exports.changePassword = async (req, res) => {
     ).exec();
 
     /***  LOG FOR SUCCESSFULL PASSWORD CHANGE  ****/
-    console.log(`Password for user '${userId}' updated!`);
+    console.log(`Password for user '${req.userId}' updated!`);
     /***  SEND RESPONSE TO USER FOR SUCCESSFULL PASSWORD CHANGE  ****/
-    res.status(200).send(`Password for user '${userId}' updated!`);
+    res.status(200).send(`Password for user '${req.userId}' updated!`);
   } catch (err) {
     console.log("Error while updating the password", err.message);
     res.status(500).send("Some internal error occured");
@@ -158,15 +165,19 @@ exports.deleteUser = async (req, res) => {
     /**** GET USERID & PASSWORD FROM REQUEST BODY ********/
     const { userId, password } = req.body;
     /**** CHECK FOR USERID & PASSWORD PROVIDED BY USER OR NOT ********/
-    if (!userId || !password) {
+    if (!isNonEmptyString(userId) || !isNonEmptyString(password)) {
       console.log("UserID/Password not provided");
-      throw new Error("UserID/Password not provided");
+      return res.status(400).send("UserID/Password not provided");
+    }
+
+    /*** A USER CAN DELETE ONLY HIS/HER OWN ACCOUNT (userId comes from verified token)  ********* */
+    if (userId.toLowerCase() !== req.userId) {
+      console.log("UserID doesn't match with the token");
+      return res.status(403).send("You can delete only your own account");
     }
 
     //find the User in DB from requested userId
-    const user = await User.findOne({
-      userId: userId,
-    });
+    const user = await User.findOne({ userId: { $eq: req.userId } });
 
     /******** CHECK WHETHER USER IN OUR DB OR NOT ***************/
     if (user == null) {
@@ -176,24 +187,24 @@ exports.deleteUser = async (req, res) => {
 
     //check whether password provided is correct or not
     let isPasswordValid = await bcrypt.compare(password, user.password);
-    if (isPasswordValid != true) throw new Error("Password not correct");
+    if (isPasswordValid != true) {
+      console.log("Password not correct");
+      return res.status(400).send("Password not correct");
+    }
 
-    //check posts with userId provided in DB
-    await Post.find({ user: userId });
-
-    //deletes all posts of provided userId
-    Post.deleteMany({ user: userId }).exec();
+    //deletes all posts of provided user
+    await Post.deleteMany({ user: { $eq: user._id } }).exec();
 
     //deletes the user with provided userId
-    User.findOneAndDelete({ userId: userId }).exec();
+    await User.findOneAndDelete({ userId: { $eq: req.userId } }).exec();
 
-    console.log(`User with userId '${userId}' and all it's data are deleted`);
+    console.log(
+      `User with userId '${user.userId}' and all it's data are deleted`
+    );
     /********  SEND RESPONSE TO USER ABOUT DELETION  **************/
-    res
-      .status(200)
-      .send(`User with userId '${userId}' and all it's data are deleted`);
+    res.status(200).send("User and all it's data are deleted");
   } catch (err) {
     console.log("Error: ", err.message);
-    res.status(400).send(err.message);
+    res.status(500).send("Internal Server Error");
   }
 };
